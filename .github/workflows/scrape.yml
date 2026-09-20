@@ -1,0 +1,95 @@
+name: Scrape and publish
+
+on:
+  schedule:
+    - cron: "0 6 * * *" # 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: scrape-and-publish
+  cancel-in-progress: false
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore seen.db and thumbs
+        run: |
+          set -euo pipefail
+          mkdir -p data/thumbs
+          if ! git ls-remote --exit-code --heads origin data >/dev/null; then
+            echo "No data branch yet; starting with an empty database."
+            exit 0
+          fi
+          git fetch origin data
+          git show origin/data:seen.db > data/seen.db
+          if git cat-file -e origin/data:thumbs 2>/dev/null; then
+            git archive origin/data thumbs | tar -x
+            mkdir -p data/thumbs
+            if [ -d thumbs ]; then
+              cp -a thumbs/. data/thumbs/
+              rm -rf thumbs
+            fi
+          fi
+          echo "Restored database $(wc -c < data/seen.db) bytes"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install
+        run: |
+          python -m venv .venv
+          .venv/bin/pip install -e .
+
+      - name: Scrape
+        run: .venv/bin/python -m bike_scraper
+
+      - name: Persist seen.db
+        run: |
+          set -euo pipefail
+          work=$(mktemp -d)
+          cp data/seen.db "$work/seen.db"
+          mkdir -p "$work/thumbs"
+          if [ -d data/thumbs ]; then
+            cp -a data/thumbs/. "$work/thumbs/" || true
+          fi
+          cd "$work"
+          git init
+          git checkout -b data
+          git add seen.db thumbs
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -m "Persist scraper data $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git push -f "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" data
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Prepare Pages site
+        run: |
+          set -euo pipefail
+          mkdir -p _site/thumbs
+          cp data/report.html _site/index.html
+          if [ -d data/thumbs ]; then
+            cp -a data/thumbs/. _site/thumbs/ || true
+          fi
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: scrape
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

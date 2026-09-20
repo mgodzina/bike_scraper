@@ -41,3 +41,15 @@ Delete `data/seen.db`, or run:
 ```
 
 The next scrape recreates an empty database. Everything currently listed will show up under **New** again. Favorites in the browser are not cleared.
+
+## GitHub Actions (optional)
+
+The workflow in `.github/workflows/scrape.yml` scrapes once a day (06:00 UTC) and can be started by hand from the Actions tab. `seen.db` is kept on a `data` branch so later runs still know which listings you have already seen. The HTML report is published with GitHub Pages.
+
+After you push the workflow:
+
+1. Repo **Settings → Pages → Build and deployment → Source: GitHub Actions**
+2. Run **Scrape and publish** once from the Actions tab (first run may ask you to approve the `github-pages` environment)
+3. Open `https://<user>.github.io/bike_scraper/`
+
+GitHub runner IPs get blocked more often than a home machine. Favorites on the Pages site are stored in that browser, separate from a local `file://` report.
