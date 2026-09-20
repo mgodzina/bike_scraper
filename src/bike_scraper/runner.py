@@ -14,7 +14,7 @@ from bike_scraper.config import (
 )
 from bike_scraper.models import AppConfig, Listing, Search
 from bike_scraper.report import format_price, write_report
-from bike_scraper.sites import bikemaster, otomoto
+from bike_scraper.sites import autoplac, bikemaster, otomoto
 from bike_scraper.store import Store
 from bike_scraper.thumbs import cache_thumbnail
 
@@ -22,6 +22,7 @@ CATEGORY_LABELS = {
     "available": "available now",
     "upcoming": "upcoming",
     "otomoto": "otomoto",
+    "autoplac": "autoplac",
 }
 
 
@@ -45,6 +46,8 @@ def fetch_search(search: Search, delay_seconds: float) -> list[Listing]:
         return bikemaster.fetch_search(search.query, search.categories, delay_seconds)
     if search.site == "otomoto":
         return otomoto.fetch_search(search.url or search.query, delay_seconds)
+    if search.site == "autoplac":
+        return autoplac.fetch_search(search.url or search.query, delay_seconds)
     raise ValueError(f"Unsupported site: {search.site}")
 
 
@@ -184,7 +187,7 @@ def run(
     new_count = 0
     try:
         for search in config.searches:
-            if query_override and search.site != "otomoto":
+            if query_override and not search.url:
                 search = Search(
                     site=search.site,
                     query=query_override,

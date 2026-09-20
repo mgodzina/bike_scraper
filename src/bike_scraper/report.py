@@ -10,11 +10,13 @@ CATEGORY_LABELS = {
     "available": "Available now",
     "upcoming": "Upcoming",
     "otomoto": "Otomoto",
+    "autoplac": "Autoplac",
 }
 
 SITE_LABELS = {
     "bikemaster": "Bikemaster",
     "otomoto": "Otomoto",
+    "autoplac": "Autoplac",
 }
 
 

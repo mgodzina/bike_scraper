@@ -12,3 +12,8 @@ categories = ["available", "upcoming"]
 site = "otomoto"
 query = "mv-agusta from 2013 up to 25000 zł"
 url = "https://www.otomoto.pl/motocykle-i-quady/mv-agusta/od-2013?search%5Bfilter_float_price%3Ato%5D=25000"
+
+[[searches]]
+site = "autoplac"
+query = "mv-agusta from 2013 up to 25000 zł"
+url = "https://autoplac.pl/oferty/motocykle/mv-agusta/cena-do-25-tysiecy?yearFrom=2013"
