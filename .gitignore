@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+data/*.db
+data/last_run
+data/report.html
+data/thumbs/
+.pytest_cache/
+.mypy_cache/

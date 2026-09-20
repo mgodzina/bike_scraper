@@ -1,0 +1,14 @@
+database = "data/seen.db"
+report = "data/report.html"
+thumbs = "data/thumbs"
+request_delay_seconds = 1.5
+
+[[searches]]
+site = "bikemaster"
+query = "agusta"
+categories = ["available", "upcoming"]
+
+[[searches]]
+site = "otomoto"
+query = "mv-agusta from 2013 up to 25000 zł"
+url = "https://www.otomoto.pl/motocykle-i-quady/mv-agusta/od-2013?search%5Bfilter_float_price%3Ato%5D=25000"

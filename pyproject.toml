@@ -1,0 +1,18 @@
+[project]
+name = "bike-scraper"
+version = "0.1.0"
+description = "Daily watcher for motorbike listings"
+requires-python = ">=3.11"
+dependencies = [
+    "beautifulsoup4>=4.12",
+]
+
+[project.scripts]
+bike-scraper = "bike_scraper.__main__:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
